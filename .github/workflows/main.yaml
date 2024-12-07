@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/* # Trigger build for feature branches
+      - master    # Trigger build and deploy when code is pushed to master
   pull_request:
     branches:
       - master # Trigger build when PR is merged into master
