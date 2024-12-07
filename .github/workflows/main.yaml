@@ -3,10 +3,10 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - master
+      - feature/* # Trigger build for feature branches
   pull_request:
     branches:
-      - master
+      - master # Trigger build when PR is merged into master
 
 jobs:
   build:
@@ -32,6 +32,15 @@ jobs:
           name: deploy-package
           path: deploy.zip
 
+  deploy:
+    if: github.ref == 'refs/heads/master' && success() # Only on master branch and if build is successful
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
         with:
@@ -40,6 +49,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
           application_name: frontend
           environment_name: Frontend-env
-          existing_bucket_name: ${{ secrets.AWS_BUCKET_NAME }}          
+          existing_bucket_name: ${{ secrets.AWS_BUCKET_NAME }}
           version_label: ${{ github.sha }}
           deployment_package: deploy.zip
